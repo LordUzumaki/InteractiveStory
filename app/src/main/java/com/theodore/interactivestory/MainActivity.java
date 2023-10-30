@@ -41,9 +41,22 @@ public class MainActivity extends AppCompatActivity {
         currentStoryNode = new StoryNode("You are at a crossroad", Arrays.asList(choice1, choice2, choice3));
 
         choiceButton1.setOnClickListener(v -> {
+            currentStoryNode = choice1.getNextNode();
 
             loadStoryNode();
         });
+
+        choiceButton2.setOnClickListener(v ->{
+            currentStoryNode = choice2.getNextNode();
+            loadStoryNode();
+        });
+
+        choiceButton3.setOnClickListener(v ->{
+            currentStoryNode = choice3.getNextNode();
+            loadStoryNode();
+        });
+        loadStoryNode();
+
 
 
 
@@ -71,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
                 choiceButton2.setVisibility(View.GONE);
             }
 
-            if (currentChoices.size() > 1) {
-                choiceButton3.setText(currentChoices.get(1).getDescription());
+            if (currentChoices.size() > 2) {
+                choiceButton3.setText(currentChoices.get(2).getDescription());
                 choiceButton3.setVisibility(View.VISIBLE);
             } else {
                 choiceButton3.setVisibility(View.GONE);
