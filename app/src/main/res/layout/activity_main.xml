@@ -7,12 +7,35 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id = "@+id/narrativeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text =""
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/choiceButton1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/choice_1"/>
+
+
+    <Button
+        android:id="@+id/choiceButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/choice_2"/>
+
+    <Button
+        android:id="@+id/choiceButton3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/choice_3"/>
+
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
