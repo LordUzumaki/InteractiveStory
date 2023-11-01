@@ -15,6 +15,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private DataBaseHelper dbHelper;
+//    private StoryDataBaseHelper dbHelper;
+
     private StoryNode currentStoryNode;
     private TextView narrativeTextView;
     private Button choiceButton1, choiceButton2, choiceButton3; // Assuming up to 3 choices for simplicity
@@ -23,38 +26,43 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dbHelper = new DataBaseHelper(this);
+        StoryNode initialStoryNode = dbHelper.getStoryNode(1);
 
-        narrativeTextView = findViewById(R.id.narrativeTextView);
-        choiceButton1 = findViewById(R.id.choiceButton1);
-        choiceButton2 = findViewById(R.id.choiceButton2);
-        choiceButton3 = findViewById(R.id.choiceButton3);
 
+        narrativeTextView.setText(initialStoryNode.getNarrative());
+
+        List<Choice> choices = initialStoryNode.getChoices();
+        choiceButton1.setText(choices.get(0).getDescription());
+        choiceButton2.setText(choices.get(1).getDescription());
+        choiceButton3.setText(choices.get(2).getDescription());
         startGame();
 
     }
 
     private void startGame(){
         // Example: Initialize your story nodes and choices
+
         Choice choice1 = new Choice("Go left", null);
         Choice choice2 = new Choice("Go right", null);
         Choice choice3 = new Choice("Go up", null);
         currentStoryNode = new StoryNode("You are at a crossroad", Arrays.asList(choice1, choice2, choice3));
 
         choiceButton1.setOnClickListener(v -> {
-            currentStoryNode = choice1.getNextNode();
-
-            loadStoryNode();
+            StoryNode nextStoryNode = dbHelper.getStoryNode(choices.get(0).getNextNodeId());
+            updateStoryNode(nextStoryNode);
         });
 
-        choiceButton2.setOnClickListener(v ->{
-            currentStoryNode = choice2.getNextNode();
-            loadStoryNode();
+        choiceButton2.setOnClickListener(v -> {
+            StoryNode nextStoryNode = dbHelper.getStoryNode(choices.get(1).getNextNodeId());
+            updateStoryNode(nextStoryNode);
         });
 
-        choiceButton3.setOnClickListener(v ->{
-            currentStoryNode = choice3.getNextNode();
-            loadStoryNode();
+        choiceButton3.setOnClickListener(v -> {
+            StoryNode nextStoryNode = dbHelper.getStoryNode(choices.get(2).getNextNodeId());
+            updateStoryNode(nextStoryNode);
         });
+
         loadStoryNode();
 
 
