@@ -15,7 +15,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private DataBaseHelper dbHelper;
+//    private DataBaseHelper dbHelper;
 //    private StoryDataBaseHelper dbHelper;
 
     private StoryNode currentStoryNode;
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        dbHelper = new DataBaseHelper(this);
+//        dbHelper = new DataBaseHelper(this);
         StoryNode initialStoryNode = dbHelper.getStoryNode(1);
 
 
