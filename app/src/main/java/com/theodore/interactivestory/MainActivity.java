@@ -4,184 +4,226 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.util.Log;
+import android.os.Handler;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
-
-
 public class MainActivity extends AppCompatActivity {
 
-//    private DataBaseHelper dbHelper;
-//    private StoryDataBaseHelper dbHelper;
-
     private TextView narrativeTextView;
-    private List<Button> choiceButtons = new ArrayList<>();
+    private final List<Button> choiceButtons = new ArrayList<>();
     private StoryNode currentStoryNode;
     private StoryNode startingStoryNode;
-   private Button choiceButton1, choiceButton2, choiceButton3;
+
+
+    private Handler typewriterHandler = new Handler(Looper.getMainLooper());
+    private int typewriterIndex = 0;
+    private static final long TYPEWRITER_DELAY_MS = 50; // Delay in milliseconds
+
+
+
 
     private void initializeStory() {
+        List<Choice> choices = new ArrayList<>();
+        List<String> humorousStyleTags = Arrays.asList("humorous", "light-hearted");
+        List<String> mysteriousStyleTags = Arrays.asList("mysterious", "dark");
 
-        StoryNode forestNode = new StoryNode("You've entered a dense forest. Birds are chirping.", null); // '...' will be choices for this node
-        StoryNode caveNode = new StoryNode("You've entered a dark cave. Bats fly past.", null); // '...' will be choices for this node
+        StoryNode nextNode1 = new StoryNode("TIn a tidy forest, a neat-freak squirrel named Simon had his acorns scrambled by a playful wind spirit. " +
+                "\nThe mess revealed a map to the fabled Golden Acorn. Simon and his friends embarked on a humorous quest, filled with silly mishaps. \nThey discovered the Golden Acorn was just a painted regular acorn. The real treasure? The laughter and adventures shared along the way. " +
+                "\nSimon learned that a little disorder could lead to unexpected joy.",humorousStyleTags, new ArrayList<>());
+        StoryNode nextNode2 = new StoryNode("Beneath the shadowy canopy of an ancient forest, a whispering pond held the secret to the village's lost memories. " +
+                "\nEvery full moon, an ethereal glow would emanate from the water, and one brave villager, Luna, dared to touch the surface. As her fingers met the liquid, " +
+                "\nvisions of forgotten times swirled before her eyes, revealing the village's ancient protectors, spirits bound to the water. Luna, now keeper of secrets, " +
+                "\nhad to choose between sharing these truths or preserving the tranquility of ignorance. Her decision remained as enigmatic as the pond itself.",mysteriousStyleTags, new ArrayList<>());
 
-        Choice exploreForestChoice = new Choice("Explore the forest", forestNode);
-        Choice enterCaveChoice = new Choice("Enter the cave", caveNode);
+        choices.add(new Choice("Humorous", nextNode1));
+        choices.add(new Choice("Mysterious", nextNode2));
 
-        // When initializing your game for the first time
-        List<Choice> someListOfChoices = Arrays.asList(exploreForestChoice, enterCaveChoice);// Define or retrieve the list of choices for the starting node.
-        startingStoryNode = new StoryNode("Beginning of your story...", someListOfChoices);
+
+        startingStoryNode = new StoryNode("You find a funny joke. Choose the following to start...", humorousStyleTags,  choices);
+
+        // Set the starting story node to the current story node
         currentStoryNode = startingStoryNode;
-
-//        if(enterCaveChoice != false){
-//            system.out.printlin("GameOver");
-//        }
-
-        //add more stories
-        StoryNode ending1 = new StoryNode("You lived happily ever after.", null);
-        StoryNode ending2 = new StoryNode("Alas, the dragon got you.", null);
-
-        Choice choice1 = new Choice("Fight the dragon", ending2);
-        Choice choice2 = new Choice("Run away from the dragon", ending1);
-
-        StoryNode encounterDragon = new StoryNode("You encounter a dragon. What do you do?", Arrays.asList(choice1, choice2));
-
-
-        currentStoryNode = encounterDragon;
-
     }
+    private void typewriterEffect(final TextView textView, final String text, final boolean isEndOfStory) {
+        textView.setText("");  // Clear the text view at the beginning of the typewriter effect
+        typewriterIndex = 0;  // Reset the typewriter index
+
+        // Remove any existing callbacks to the handler that might be from previous typewriter effect runs
+        typewriterHandler.removeCallbacksAndMessages(null);
+
+        Runnable typewriterRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (typewriterIndex < text.length()) {
+                    // Add the next character to the TextView's text
+                    textView.append(String.valueOf(text.charAt(typewriterIndex)));
+                    typewriterIndex++;
+                    typewriterHandler.postDelayed(this, TYPEWRITER_DELAY_MS);
+                } else if (isEndOfStory) {
+                    // If this is the end of the story, append the restart prompt
+                    textView.append("\n\nTap here to restart.");
+                    // Also, set an OnClickListener to restart the game when the text is tapped
+                    textView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            restartGame();
+                        }
+                    });
+                    // Since the story is finished, we don't need to post any more runnables
+                    typewriterHandler.removeCallbacksAndMessages(null);
+                }
+            }
+        };
+
+        typewriterHandler.post(typewriterRunnable);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Remove any callbacks to stop the typewriter effect when the activity is not visible
+        typewriterHandler.removeCallbacksAndMessages(null);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Remove any callbacks to stop the typewriter effect when the activity is being destroyed
+        typewriterHandler.removeCallbacksAndMessages(null);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);  // This should come first
+        setContentView(R.layout.activity_main);
+
 
         narrativeTextView = findViewById(R.id.narrativeTextView);
-
-        choiceButton1 = findViewById(R.id.choiceButton1);
-        choiceButton2 = findViewById(R.id.choiceButton2);
-        choiceButton3 = findViewById(R.id.choiceButton3);
+//        ImageView imageView = findViewById(R.id.imageView);
+        Button choiceButton1 = findViewById(R.id.choiceButton1);
+        Button choiceButton2 = findViewById(R.id.choiceButton2);
+        Button choiceButton3 = findViewById(R.id.choiceButton3);
 
         choiceButtons.add(choiceButton1);
         choiceButtons.add(choiceButton2);
         choiceButtons.add(choiceButton3);
 
-
-
-
-
-
-        choiceButton1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Define the action for choiceButton1 here
-                // For example, display a message or perform some other action
-                // You can also update the story node or game state as needed
-                Log.d("ButtonTest", "Button 2 clicked");
-
-                narrativeTextView.setText("You chose option 1");
-
-
-            }
-        });
-
-        choiceButton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Define the action for choiceButton2 here
-                // For example, display a message or perform other actions
-                narrativeTextView.setText("You chose option 2");
-            }
-        });
-
-
-        choiceButton3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Define the action for choiceButton3 here
-                // For example, display a message or perform other actions
-                narrativeTextView.setText("You chose option 3");
-            }
-        });
+        // Set up click listeners for buttons
+        setUpChoiceButtonListeners();
 
         initializeStory();
+
+
+
         loadStoryNode();
-//        startGame();
 
-
-        // ... other initialization code ...
     }
 
 
-    // You can define the updateStoryNode method to update the current story node and UI
+
+    private void setUpChoiceButtonListeners() {
+        View.OnClickListener choiceButtonListener = v -> {
+            int buttonIndex = choiceButtons.indexOf(v);
+            if (buttonIndex != -1) {
+                Choice chosenChoice = currentStoryNode.getChoices().get(buttonIndex);
+                updateStoryNode(chosenChoice.getNextNode());
+            }
+        };
+
+        for (Button button : choiceButtons) {
+            button.setOnClickListener(choiceButtonListener);
+        }
+    }
+
     private void updateStoryNode(StoryNode nextStoryNode) {
         currentStoryNode = nextStoryNode;
         loadStoryNode();
     }
 
-
-    private void restartGame() {
-        currentStoryNode = startingStoryNode;
-        narrativeTextView.setOnClickListener(null);  // Remove the restart click listener
-        loadStoryNode();
-    }
-
-
-
-
     private void loadStoryNode(){
-            // Display the narrative of the current node
-        narrativeTextView.setText(currentStoryNode.getNarrative());
-        if (currentStoryNode.getChoices() == null || currentStoryNode.getChoices().isEmpty()) {
-            // No choices, end of story
+        // Check if this is the end of the story
+        boolean isEndOfStory = currentStoryNode.getChoices() == null || currentStoryNode.getChoices().isEmpty();
+
+        // Apply the typewriter effect to the narrative of the current node
+        typewriterEffect(narrativeTextView, currentStoryNode.getNarrative(), isEndOfStory);
+
+        if (isEndOfStory) {
+            // No choices, end of story - we handle the restart prompt in the typewriterEffect method
             for (Button button : choiceButtons) {
                 button.setVisibility(View.GONE);
             }
-            // Set the narrativeTextView to display a message prompting the user to restart
-            narrativeTextView.append("\n\nTap here to restart.");
-            narrativeTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    restartGame();
-                }
-            });
-            return;
-            // Optionally, show a "Restart" or "Exit" button here
+        } else {
+            // Display choices if there are any
+            displayChoices(currentStoryNode.getChoices());
         }
+    }
 
-        for (int i = 0; i < currentStoryNode.getChoices().size(); i++) {
-            Choice choice = currentStoryNode.getChoices().get(i);
-            Button button = choiceButtons.get(i);
-            button.setText(choice.getDescription());
-            button.setTextColor(getColor(R.color.Red));
-            button.setVisibility(View.VISIBLE);
-
-            button.setOnClickListener(v -> {
-                // Move to the next story node based on the chosen option
-                currentStoryNode = choice.getNextNode();
-                loadStoryNode();
-            });
+    private void displayChoices(List<Choice> choices) {
+        for (int i = 0; i < choiceButtons.size(); i++) {
+            final Button button = choiceButtons.get(i);
+            if (i < choices.size()) {
+                final Choice choice = choices.get(i);
+                button.setText(choice.getDescription());
+                button.setVisibility(View.VISIBLE);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Move to the next story node based on the chosen option
+                        updateStoryNode(choice.getNextNode());
+                    }
+                });
+            } else {
+                button.setVisibility(View.GONE);
+            }
         }
-
-
-        // Hide any unused buttons
-        for (int i = currentStoryNode.getChoices().size(); i < choiceButtons.size(); i++) {
-            choiceButtons.get(i).setVisibility(View.GONE);
-        }
-
-
-
-
-
     }
 
 
+
+
+
+    private void updateChoiceButtons() {
+        List<Choice> choices = currentStoryNode.getChoices();
+        for (int i = 0; i < choiceButtons.size(); i++) {
+            Button button = choiceButtons.get(i);
+            if (i < choices.size()) {
+                Choice choice = choices.get(i);
+                button.setText(choice.getDescription());
+                button.setVisibility(View.VISIBLE);
+            } else {
+                button.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void restartGame() {
+        // Reset the game to the starting node
+        currentStoryNode = startingStoryNode;
+
+        // Make sure to clear any text that was appended as part of the end of story
+        narrativeTextView.setText("");
+
+        // Load the starting node again
+        loadStoryNode();
+    }
+
+    private void applyVisualStyle(List<String> styleTags) {
+        if (styleTags.contains("humorous")) {
+            narrativeTextView.setBackgroundColor(ContextCompat.getColor(this, R.color.humorousBackground));
+            narrativeTextView.setTextColor(ContextCompat.getColor(this, R.color.humorousText));
+        } else if (styleTags.contains("mysterious")) {
+            narrativeTextView.setBackgroundColor(ContextCompat.getColor(this, R.color.mysteriousBackground));
+            narrativeTextView.setTextColor(ContextCompat.getColor(this, R.color.mysteriousText));
+        }
+        // Add more styles as needed
+    }
 }

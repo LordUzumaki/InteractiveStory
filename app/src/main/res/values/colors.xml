@@ -5,6 +5,12 @@
     <color name="yellow">#FFFF00</color>
     <color name="Red">#FF0000</color>
 
+    <color name="humorousBackground">#FFC107</color>
+    <color name="humorousText">#FFFFFF</color>
+
+    <color name="mysteriousBackground">#6200EA</color>
+    <color name="mysteriousText">#FFFFFF</color>
+
 
 
 </resources>
