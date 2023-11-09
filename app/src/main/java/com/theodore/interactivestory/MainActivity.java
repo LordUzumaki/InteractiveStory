@@ -3,13 +3,17 @@ package com.theodore.interactivestory;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.os.Handler;
+import android.util.Log;
+
+
 
 
 import java.util.ArrayList;
@@ -17,15 +21,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
     private TextView narrativeTextView;
+    private ImageView imageView; // Class member variable
     private final List<Button> choiceButtons = new ArrayList<>();
     private StoryNode currentStoryNode;
     private StoryNode startingStoryNode;
-
-
-    private Handler typewriterHandler = new Handler(Looper.getMainLooper());
-    private int typewriterIndex = 0;
+    private final Handler typewriterHandler = new Handler(Looper.getMainLooper());
+    private int typewriterIndex;
     private static final long TYPEWRITER_DELAY_MS = 50; // Delay in milliseconds
 
 
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         // Set the starting story node to the current story node
         currentStoryNode = startingStoryNode;
     }
+
+
     private void typewriterEffect(final TextView textView, final String text, final boolean isEndOfStory) {
         textView.setText("");  // Clear the text view at the beginning of the typewriter effect
         typewriterIndex = 0;  // Reset the typewriter index
@@ -86,6 +90,23 @@ public class MainActivity extends AppCompatActivity {
 
         typewriterHandler.post(typewriterRunnable);
     }
+    private void updateStoryAndImage(StoryNode storyNode) {
+        // Update the text with typewriter effect
+        typewriterEffect(narrativeTextView, currentStoryNode.getNarrative(), true);
+        Log.d("MainActivity", "Updating story and image.");
+
+        // Update the image based on style tags
+        if (storyNode.getStyleTags().contains("humorous")) {
+            Log.d("MainActivity", "Setting image to humorous.");
+
+            imageView.setImageResource(R.drawable.heart_of_this_forest);
+        } else if (storyNode.getStyleTags().contains("mysterious")) {
+            Log.d("MainActivity", "Setting image to humorous.");
+            imageView.setImageResource(R.drawable.image_of_a_mysterious);
+        }
+
+        updateChoiceButtons();
+    }
 
     @Override
     protected void onPause() {
@@ -108,14 +129,19 @@ public class MainActivity extends AppCompatActivity {
 
 
         narrativeTextView = findViewById(R.id.narrativeTextView);
-//        ImageView imageView = findViewById(R.id.imageView);
+        imageView = findViewById(R.id.imageView); // Initialize class member variable, not a local variable
         Button choiceButton1 = findViewById(R.id.choiceButton1);
         Button choiceButton2 = findViewById(R.id.choiceButton2);
-        Button choiceButton3 = findViewById(R.id.choiceButton3);
+
+
+
 
         choiceButtons.add(choiceButton1);
         choiceButtons.add(choiceButton2);
-        choiceButtons.add(choiceButton3);
+
+//        imageView.setImageResource(R.drawable.heart_of_this_forest);
+//        imageView.setBackgroundColor(Color.RED);
+
 
         // Set up click listeners for buttons
         setUpChoiceButtonListeners();
@@ -125,6 +151,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         loadStoryNode();
+        Log.d("MainActivity", "onCreate completed");
+
+        // Load the initial story node
+        updateStoryAndImage(currentStoryNode);
 
     }
 
@@ -136,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
             if (buttonIndex != -1) {
                 Choice chosenChoice = currentStoryNode.getChoices().get(buttonIndex);
                 updateStoryNode(chosenChoice.getNextNode());
+                updateStoryAndImage(chosenChoice.getNextNode());
             }
         };
 
@@ -216,14 +247,14 @@ public class MainActivity extends AppCompatActivity {
         loadStoryNode();
     }
 
-    private void applyVisualStyle(List<String> styleTags) {
-        if (styleTags.contains("humorous")) {
-            narrativeTextView.setBackgroundColor(ContextCompat.getColor(this, R.color.humorousBackground));
-            narrativeTextView.setTextColor(ContextCompat.getColor(this, R.color.humorousText));
-        } else if (styleTags.contains("mysterious")) {
-            narrativeTextView.setBackgroundColor(ContextCompat.getColor(this, R.color.mysteriousBackground));
-            narrativeTextView.setTextColor(ContextCompat.getColor(this, R.color.mysteriousText));
-        }
-        // Add more styles as needed
-    }
+//    private void applyVisualStyle(List<String> styleTags) {
+//        if (styleTags.contains("humorous")) {
+//            narrativeTextView.setBackgroundColor(ContextCompat.getColor(this, R.color.humorousBackground));
+//            narrativeTextView.setTextColor(ContextCompat.getColor(this, R.color.humorousText));
+//        } else if (styleTags.contains("mysterious")) {
+//            narrativeTextView.setBackgroundColor(ContextCompat.getColor(this, R.color.mysteriousBackground));
+//            narrativeTextView.setTextColor(ContextCompat.getColor(this, R.color.mysteriousText));
+//        }
+//        // Add more styles as needed
+//    }
 }
