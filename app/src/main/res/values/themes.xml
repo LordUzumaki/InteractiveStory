@@ -8,6 +8,19 @@
 
     </style>
 
+    <style name="HumorousNodeStyle">
+<!--        <item name="android:background">@color/humorousBackground</item>-->
+        <item name="android:textColor">@color/humorousText</item>
+        <!-- Add more style attributes as needed -->
+    </style>
+
+
+    <style name="MysteriousNodeStyle">
+        <item name="android:background">@color/mysteriousBackground</item>
+        <item name="android:textColor">@color/mysteriousText</item>
+        <!-- Add more style attributes as needed -->
+    </style>
+
 
 
     <style name="Theme.InteractiveStory" parent="Base.Theme.InteractiveStory" />
