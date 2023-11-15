@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">InteractiveStory</string>
-    <string name="Humorous">Choice 1</string>
-    <string name="Mysterious">Choice 2</string>
+    <string name="Humorous">Humorous</string>
+    <string name="Mysterious">Mysterious</string>
+
 
 
 

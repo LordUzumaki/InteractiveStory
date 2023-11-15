@@ -1,8 +1,8 @@
 package com.theodore.interactivestory;
 
 public class Choice {
-    private String description;
-    private StoryNode nextNode;
+    private final String description;
+    private final StoryNode nextNode;
 
     public Choice(String description, StoryNode nextNode) {
         this.description = description;

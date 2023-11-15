@@ -1,9 +1,6 @@
 package com.theodore.interactivestory;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Handler;
@@ -11,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.util.Log;
+
 
 
 
@@ -30,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     private int typewriterIndex;
     private static final long TYPEWRITER_DELAY_MS = 50; // Delay in milliseconds
 
+    public boolean image1Displaying = false;
+
 
 
 
@@ -38,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
         List<String> humorousStyleTags = Arrays.asList("humorous", "light-hearted");
         List<String> mysteriousStyleTags = Arrays.asList("mysterious", "dark");
 
-        StoryNode nextNode1 = new StoryNode("TIn a tidy forest, a neat-freak squirrel named Simon had his acorns scrambled by a playful wind spirit. " +
+
+
+        StoryNode nextNode1 = new StoryNode("Tin a tidy forest, a neat-freak squirrel named Simon had his acorns scrambled by a playful wind spirit. " +
                 "\nThe mess revealed a map to the fabled Golden Acorn. Simon and his friends embarked on a humorous quest, filled with silly mishaps. \nThey discovered the Golden Acorn was just a painted regular acorn. The real treasure? The laughter and adventures shared along the way. " +
                 "\nSimon learned that a little disorder could lead to unexpected joy.",humorousStyleTags, new ArrayList<>());
         StoryNode nextNode2 = new StoryNode("Beneath the shadowy canopy of an ancient forest, a whispering pond held the secret to the village's lost memories. " +
@@ -46,11 +47,12 @@ public class MainActivity extends AppCompatActivity {
                 "\nvisions of forgotten times swirled before her eyes, revealing the village's ancient protectors, spirits bound to the water. Luna, now keeper of secrets, " +
                 "\nhad to choose between sharing these truths or preserving the tranquility of ignorance. Her decision remained as enigmatic as the pond itself.",mysteriousStyleTags, new ArrayList<>());
 
+
         choices.add(new Choice("Humorous", nextNode1));
         choices.add(new Choice("Mysterious", nextNode2));
 
 
-        startingStoryNode = new StoryNode("You find a funny joke. Choose the following to start...", humorousStyleTags,  choices);
+        startingStoryNode = new StoryNode("You find a funny joke. Choose the following to start...", humorousStyleTags, choices);
 
         // Set the starting story node to the current story node
         currentStoryNode = startingStoryNode;
@@ -76,34 +78,52 @@ public class MainActivity extends AppCompatActivity {
                     // If this is the end of the story, append the restart prompt
                     textView.append("\n\nTap here to restart.");
                     // Also, set an OnClickListener to restart the game when the text is tapped
-                    textView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            restartGame();
-                        }
-                    });
+                    textView.setOnClickListener(v -> restartGame());
                     // Since the story is finished, we don't need to post any more runnables
                     typewriterHandler.removeCallbacksAndMessages(null);
+
+
                 }
             }
         };
 
         typewriterHandler.post(typewriterRunnable);
     }
+
     private void updateStoryAndImage(StoryNode storyNode) {
+       // Log.d("MainActivity", "Updating story and image. Current Style Tags: " + storyNode.getStyleTags());
+
+        narrativeTextView.setText(storyNode.getNarrative());
         // Update the text with typewriter effect
         typewriterEffect(narrativeTextView, currentStoryNode.getNarrative(), true);
-        Log.d("MainActivity", "Updating story and image.");
+//        Log.d("MainActivity", "Updating story and image.");
+        for (Button button : choiceButtons) {
+            button.setOnClickListener(v -> {
+                int buttonIndex = choiceButtons.indexOf(v);
+                if (buttonIndex != -1) {
+                    Choice choices = currentStoryNode.getChoices().get(buttonIndex);
+                    updateStoryNode(choices.getNextNode());
 
-        // Update the image based on style tags
-        if (storyNode.getStyleTags().contains("humorous")) {
-            Log.d("MainActivity", "Setting image to humorous.");
+                    // Check if the 'Humorous' button is clicked
+                    if (choices.getDescription().equalsIgnoreCase("Humorous")) {
+                        imageView.setImageResource(R.drawable.ancient_forest); // Replace with your image resource
+                        image1Displaying = false;
+                    } else if (choices.getDescription().equalsIgnoreCase("Mysterious")) {
+                        imageView.setImageResource(R.drawable.image_of_a_mysterious); // Replace with your image resource
+                        image1Displaying = true;
+                    }
+                    handleChoiceButtonClicked(choices.getDescription());
+                    updateStoryAndImage(choices.getNextNode());
+                    initializeStory();
 
-            imageView.setImageResource(R.drawable.heart_of_this_forest);
-        } else if (storyNode.getStyleTags().contains("mysterious")) {
-            Log.d("MainActivity", "Setting image to humorous.");
-            imageView.setImageResource(R.drawable.image_of_a_mysterious);
+
+
+                }
+            });
         }
+
+
+
 
         updateChoiceButtons();
     }
@@ -121,6 +141,14 @@ public class MainActivity extends AppCompatActivity {
         typewriterHandler.removeCallbacksAndMessages(null);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reset the image to the original one when the activity resumes
+        imageView.setImageResource(R.drawable.heart_of_this_forest); // Replace 'original_image' with the actual name of your original image
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,50 +158,53 @@ public class MainActivity extends AppCompatActivity {
 
         narrativeTextView = findViewById(R.id.narrativeTextView);
         imageView = findViewById(R.id.imageView); // Initialize class member variable, not a local variable
-        Button choiceButton1 = findViewById(R.id.choiceButton1);
-        Button choiceButton2 = findViewById(R.id.choiceButton2);
 
+        Button Humorous = findViewById(R.id.Humorous);
+        Button Mysterious = findViewById(R.id.Mysterious);
 
-
-
-        choiceButtons.add(choiceButton1);
-        choiceButtons.add(choiceButton2);
-
-//        imageView.setImageResource(R.drawable.heart_of_this_forest);
-//        imageView.setBackgroundColor(Color.RED);
-
-
-        // Set up click listeners for buttons
-        setUpChoiceButtonListeners();
+//        choiceButtons.add(choiceButton1);
+//        choiceButtons.add(choiceButton2);
+        Humorous.setOnClickListener(v -> handleChoiceButtonClicked("Humorous"));
+        Mysterious.setOnClickListener(v -> handleChoiceButtonClicked("Mysterious"));
 
         initializeStory();
 
+        // Set up button listener for the first choice
 
 
-        loadStoryNode();
-        Log.d("MainActivity", "onCreate completed");
+
+
 
         // Load the initial story node
         updateStoryAndImage(currentStoryNode);
 
+        loadStoryNode();
+
     }
 
+    private void handleChoiceButtonClicked(String choiceDescription) {
+        for (int i = 0; i < currentStoryNode.getChoices().size(); i++) {
+            Choice choice = currentStoryNode.getChoices().get(i);
+            if (choice.getDescription().equalsIgnoreCase(choiceDescription)) {
+                updateStoryNode(choice.getNextNode());
 
+                if (choiceDescription.equalsIgnoreCase("Humorous")) {
+                    imageView.setImageResource(R.drawable.ancient_forest);
+                } else if (choiceDescription.equalsIgnoreCase("Mysterious")) {
+                    imageView.setImageResource(R.drawable.image_of_a_mysterious);
+                }
 
-    private void setUpChoiceButtonListeners() {
-        View.OnClickListener choiceButtonListener = v -> {
-            int buttonIndex = choiceButtons.indexOf(v);
-            if (buttonIndex != -1) {
-                Choice chosenChoice = currentStoryNode.getChoices().get(buttonIndex);
-                updateStoryNode(chosenChoice.getNextNode());
-                updateStoryAndImage(chosenChoice.getNextNode());
+                break;
             }
-        };
-
-        for (Button button : choiceButtons) {
-            button.setOnClickListener(choiceButtonListener);
         }
     }
+
+
+
+
+
+
+
 
     private void updateStoryNode(StoryNode nextStoryNode) {
         currentStoryNode = nextStoryNode;
@@ -205,12 +236,9 @@ public class MainActivity extends AppCompatActivity {
                 final Choice choice = choices.get(i);
                 button.setText(choice.getDescription());
                 button.setVisibility(View.VISIBLE);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Move to the next story node based on the chosen option
-                        updateStoryNode(choice.getNextNode());
-                    }
+                button.setOnClickListener(v -> {
+                    // Move to the next story node based on the chosen option
+                    updateStoryNode(choice.getNextNode());
                 });
             } else {
                 button.setVisibility(View.GONE);
@@ -239,22 +267,19 @@ public class MainActivity extends AppCompatActivity {
     private void restartGame() {
         // Reset the game to the starting node
         currentStoryNode = startingStoryNode;
+        onResume();
+
 
         // Make sure to clear any text that was appended as part of the end of story
         narrativeTextView.setText("");
 
+
+
         // Load the starting node again
         loadStoryNode();
-    }
 
-//    private void applyVisualStyle(List<String> styleTags) {
-//        if (styleTags.contains("humorous")) {
-//            narrativeTextView.setBackgroundColor(ContextCompat.getColor(this, R.color.humorousBackground));
-//            narrativeTextView.setTextColor(ContextCompat.getColor(this, R.color.humorousText));
-//        } else if (styleTags.contains("mysterious")) {
-//            narrativeTextView.setBackgroundColor(ContextCompat.getColor(this, R.color.mysteriousBackground));
-//            narrativeTextView.setTextColor(ContextCompat.getColor(this, R.color.mysteriousText));
-//        }
-//        // Add more styles as needed
-//    }
+
+
+
+    }
 }
