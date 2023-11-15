@@ -116,15 +116,9 @@ public class MainActivity extends AppCompatActivity {
                     updateStoryAndImage(choices.getNextNode());
                     initializeStory();
 
-
-
                 }
             });
         }
-
-
-
-
         updateChoiceButtons();
     }
 
