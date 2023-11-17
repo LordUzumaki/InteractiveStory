@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.text.method.ScrollingMovementMethod;
 
 
 
@@ -18,21 +19,23 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView narrativeTextView;
-    private ImageView imageView; // Class member variable
-    private final List<Button> choiceButtons = new ArrayList<>();
-    private StoryNode currentStoryNode;
-    private StoryNode startingStoryNode;
-    private final Handler typewriterHandler = new Handler(Looper.getMainLooper());
-    private int typewriterIndex;
-    private static final long TYPEWRITER_DELAY_MS = 50; // Delay in milliseconds
+    // Declaration of member variables for the activity
+    private TextView narrativeTextView; // TextView for displaying the story narrative
+    private ImageView imageView; // ImageView for showing images associated with the story
+    private final List<Button> choiceButtons = new ArrayList<>(); // List to hold choice buttons
+    private StoryNode currentStoryNode; // Current node in the story
+    private StoryNode startingStoryNode; // Starting node of the story
+    private final Handler typewriterHandler = new Handler(Looper.getMainLooper()); // Handler for typewriter effect
+    private int typewriterIndex; // Index used in typewriter effect
+    private static final long TYPEWRITER_DELAY_MS = 50; // Delay for typewriter effect in milliseconds
 
-    public boolean image1Displaying = false;
+    public boolean image1Displaying = false; // Flag to track if a specific image is currently displayed
 
 
 
-
+    // Initialize the story nodes and choices
     private void initializeStory() {
+
         List<Choice> choices = new ArrayList<>();
         List<String> humorousStyleTags = Arrays.asList("humorous", "light-hearted");
         List<String> mysteriousStyleTags = Arrays.asList("mysterious", "dark");
@@ -58,8 +61,9 @@ public class MainActivity extends AppCompatActivity {
         currentStoryNode = startingStoryNode;
     }
 
-
+    // Creates a typewriter effect for displaying text
     private void typewriterEffect(final TextView textView, final String text, final boolean isEndOfStory) {
+        // ... Typewriter effect logic ...
         textView.setText("");  // Clear the text view at the beginning of the typewriter effect
         typewriterIndex = 0;  // Reset the typewriter index
 
@@ -79,10 +83,8 @@ public class MainActivity extends AppCompatActivity {
                     textView.append("\n\nTap here to restart.");
                     // Also, set an OnClickListener to restart the game when the text is tapped
                     textView.setOnClickListener(v -> restartGame());
-                    // Since the story is finished, we don't need to post any more runnables
+                    // Since the story is finished, we don't need to post any more runnable
                     typewriterHandler.removeCallbacksAndMessages(null);
-
-
                 }
             }
         };
@@ -90,13 +92,12 @@ public class MainActivity extends AppCompatActivity {
         typewriterHandler.post(typewriterRunnable);
     }
 
+    // Updates the story and the image based on the current story node
     private void updateStoryAndImage(StoryNode storyNode) {
-       // Log.d("MainActivity", "Updating story and image. Current Style Tags: " + storyNode.getStyleTags());
 
         narrativeTextView.setText(storyNode.getNarrative());
         // Update the text with typewriter effect
         typewriterEffect(narrativeTextView, currentStoryNode.getNarrative(), true);
-//        Log.d("MainActivity", "Updating story and image.");
         for (Button button : choiceButtons) {
             button.setOnClickListener(v -> {
                 int buttonIndex = choiceButtons.indexOf(v);
@@ -121,20 +122,21 @@ public class MainActivity extends AppCompatActivity {
         }
         updateChoiceButtons();
     }
-
+    // Lifecycle callback method, called when the activity is paused
     @Override
     protected void onPause() {
         super.onPause();
         // Remove any callbacks to stop the typewriter effect when the activity is not visible
         typewriterHandler.removeCallbacksAndMessages(null);
     }
+    // Lifecycle callback method, called when the activity is destroyed
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // Remove any callbacks to stop the typewriter effect when the activity is being destroyed
         typewriterHandler.removeCallbacksAndMessages(null);
     }
-
+    // Lifecycle callback method, called when the activity resumes
     @Override
     protected void onResume() {
         super.onResume();
@@ -143,39 +145,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    // Lifecycle callback method, called when the activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         narrativeTextView = findViewById(R.id.narrativeTextView);
+        narrativeTextView.setMovementMethod(new ScrollingMovementMethod());
         imageView = findViewById(R.id.imageView); // Initialize class member variable, not a local variable
-
         Button Humorous = findViewById(R.id.Humorous);
         Button Mysterious = findViewById(R.id.Mysterious);
-
-//        choiceButtons.add(choiceButton1);
-//        choiceButtons.add(choiceButton2);
         Humorous.setOnClickListener(v -> handleChoiceButtonClicked("Humorous"));
         Mysterious.setOnClickListener(v -> handleChoiceButtonClicked("Mysterious"));
 
         initializeStory();
-
-        // Set up button listener for the first choice
-
-
-
-
-
         // Load the initial story node
         updateStoryAndImage(currentStoryNode);
 
         loadStoryNode();
 
     }
-
+    // Handles button clicks based on the choice description
     private void handleChoiceButtonClicked(String choiceDescription) {
         for (int i = 0; i < currentStoryNode.getChoices().size(); i++) {
             Choice choice = currentStoryNode.getChoices().get(i);
@@ -192,19 +182,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
-
-
-
-
-
-
+    // Updates the current story node
     private void updateStoryNode(StoryNode nextStoryNode) {
         currentStoryNode = nextStoryNode;
         loadStoryNode();
     }
-
+    // Loads the current story node and updates UI accordingly
     private void loadStoryNode(){
         // Check if this is the end of the story
         boolean isEndOfStory = currentStoryNode.getChoices() == null || currentStoryNode.getChoices().isEmpty();
@@ -222,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
             displayChoices(currentStoryNode.getChoices());
         }
     }
-
+    // Displays the available choices as buttons
     private void displayChoices(List<Choice> choices) {
         for (int i = 0; i < choiceButtons.size(); i++) {
             final Button button = choiceButtons.get(i);
@@ -239,11 +222,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
-
-
-
+    // Updates the visibility and text of choice buttons
     private void updateChoiceButtons() {
         List<Choice> choices = currentStoryNode.getChoices();
         for (int i = 0; i < choiceButtons.size(); i++) {
@@ -257,18 +236,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+    // Resets the game to the starting story node
     private void restartGame() {
         // Reset the game to the starting node
         currentStoryNode = startingStoryNode;
         onResume();
-
-
         // Make sure to clear any text that was appended as part of the end of story
         narrativeTextView.setText("");
-
-
-
         // Load the starting node again
         loadStoryNode();
 
