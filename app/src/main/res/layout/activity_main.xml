@@ -7,6 +7,8 @@
     tools:context=".MainActivity">
 
 
+
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="829dp"
@@ -21,19 +23,31 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.257" />
 
+
+    <View
+        android:id="@+id/rectangle_3"
+        android:layout_width="357dp"
+        android:layout_height="597dp"
+        android:background="#594A3030"
+        app:layout_constraintEnd_toEndOf="@+id/narrativeTextView"
+        app:layout_constraintHorizontal_bias="0.489"
+        app:layout_constraintStart_toStartOf="@+id/narrativeTextView"
+        app:layout_constraintTop_toTopOf="@+id/narrativeTextView" />
+
     <TextView
         android:id="@+id/narrativeTextView"
+
         android:layout_width="360dp"
         android:layout_height="593dp"
         android:background="#000000"
         android:backgroundTint="?android:attr/windowSplashScreenBackground"
         android:fontFamily="casual"
         android:padding="16dp"
+        android:scrollbars="vertical"
         android:shadowColor="#000000"
         android:shadowDx="5"
         android:shadowDy="5"
         android:shadowRadius="6"
-        android:scrollbars="vertical"
         android:text="Your_story_text_here"
         android:textColor="#F433FF"
         android:textSize="16sp"
@@ -41,9 +55,10 @@
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/imageView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.313"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.031"
+        app:layout_constraintVertical_bias="0.032"
         tools:visibility="visible" />
 
     <Button
